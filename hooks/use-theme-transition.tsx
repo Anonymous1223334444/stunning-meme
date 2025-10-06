@@ -39,18 +39,23 @@ export function ThemeTransitionProvider({ children }: { children: React.ReactNod
   const startTransition = useCallback(
     (targetTheme: ThemeMode, origin?: ThemeOrigin) => {
       if (isTransitioning) return
-      
-      // Set up the overlay to show the TARGET theme
-      setOverlayOrigin(origin || { x: window.innerWidth / 2, y: window.innerHeight / 2 })
+
+      const originPoint = origin || { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+
+      setOverlayOrigin(originPoint)
       setOverlayTheme(targetTheme)
       setIsTransitioning(true)
 
-      // After animation completes, actually change the theme and cleanup
-      setTimeout(() => {
-        setTheme(targetTheme)
-        setIsTransitioning(false)
-        setOverlayOrigin(null)
-      }, 500) // Match animation duration
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setTheme(targetTheme)
+        }, 100)
+
+        setTimeout(() => {
+          setIsTransitioning(false)
+          setOverlayOrigin(null)
+        }, 600)
+      })
     },
     [isTransitioning, setTheme]
   )

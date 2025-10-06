@@ -15,31 +15,53 @@ export function ThemeTransition() {
     return null
   }
 
-  // Calculate the maximum radius needed to cover the entire screen
   const maxRadius = Math.sqrt(
     Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2)
   )
 
-  // Theme colors - these should match your actual theme colors
-  const backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--background')
+  const themeColors = {
+    light: 'oklch(0.99 0.005 264)',
+    dark: 'oklch(0.08 0.015 264)',
+  }
 
-  // Create a unique animation name to avoid conflicts
-  const animationName = `expandThemeCircle-${Date.now()}`
+  const backgroundColor = themeColors[overlayTheme]
+  const animationName = `expandCircle-${Date.now()}`
+  const rippleAnimationName = `ripple-${Date.now()}`
 
   return (
     <>
       <div
+        className="theme-transition-overlay"
         style={{
           position: "fixed",
           top: 0,
           left: 0,
-          width: "100%",
-          height: "100%",
+          width: "100vw",
+          height: "100vh",
           backgroundColor,
           clipPath: `circle(0px at ${overlayOrigin.x}px ${overlayOrigin.y}px)`,
-          animation: `${animationName} 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards`,
-          zIndex: 9999,
+          animation: `${animationName} 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
+          zIndex: 99999,
           pointerEvents: "none",
+          willChange: "clip-path",
+        }}
+      />
+      <div
+        className="theme-transition-ripple"
+        style={{
+          position: "fixed",
+          top: overlayOrigin.y,
+          left: overlayOrigin.x,
+          width: "40px",
+          height: "40px",
+          marginLeft: "-20px",
+          marginTop: "-20px",
+          borderRadius: "50%",
+          border: `2px solid ${backgroundColor}`,
+          animation: `${rippleAnimationName} 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
+          zIndex: 100000,
+          pointerEvents: "none",
+          opacity: 0.5,
         }}
       />
       <style dangerouslySetInnerHTML={{
@@ -49,7 +71,17 @@ export function ThemeTransition() {
               clip-path: circle(0px at ${overlayOrigin.x}px ${overlayOrigin.y}px);
             }
             100% {
-              clip-path: circle(${maxRadius}px at ${overlayOrigin.x}px ${overlayOrigin.y}px);
+              clip-path: circle(${maxRadius * 1.2}px at ${overlayOrigin.x}px ${overlayOrigin.y}px);
+            }
+          }
+          @keyframes ${rippleAnimationName} {
+            0% {
+              transform: scale(1);
+              opacity: 0.5;
+            }
+            100% {
+              transform: scale(${maxRadius / 20});
+              opacity: 0;
             }
           }
         `
