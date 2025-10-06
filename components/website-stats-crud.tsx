@@ -40,7 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Pencil, Trash2, Plus, TrendingUp, BarChart3, DollarSign } from 'lucide-react';
+import { Pencil, Trash2, Plus, TrendingUp, ChartBar as BarChart3, DollarSign } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
