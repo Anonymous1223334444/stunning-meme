@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { ChartBar as BarChart3, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, Monitor, Shield, Award, Mail, Palette, Zap, Info, Database, RefreshCw, MapPin, LayoutGrid as Layout, Briefcase, Phone, DollarSign, Activity, Search, FileText, Bell, User, Users, Download, Target, Settings, Calendar, ChevronLeft, ChevronRight, Clock } from "lucide-react"
+import { ChartBar as BarChart3, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, Monitor, Shield, Award, Mail, Palette, Zap, Info, Database, RefreshCw, MapPin, LayoutGrid as Layout, Briefcase, Phone, DollarSign, Activity, Search, FileText, Bell, User, Users, Download, Target, Settings, Calendar, ChevronLeft, ChevronRight, Clock, LogOut } from "lucide-react"
 import { ProjectCard } from "@/components/project-card"
 import { ActivityFeed } from "@/components/activity-feed"
 import { ProjectTable } from "@/components/project-table"
@@ -24,6 +24,7 @@ import { ComprehensiveAnalytics } from "@/components/comprehensive-analytics"
 import { cn } from "@/lib/utils"
 import { ResponsiveGrid } from "@/components/responsive-grid"
 import { ThemeCustomization } from "@/components/theme-customization"
+import { useWebsiteStats } from "@/hooks/use-website-stats"
 
 // Données du projet PAENS basées sur le fichier HTML original
 const paensData = {
@@ -526,7 +527,7 @@ const progressData = [
 const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
 
 export default function Dashboard() {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -536,6 +537,7 @@ export default function Dashboard() {
   const [selectedComponent, setSelectedComponent] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
+  const { stats, loading: statsLoading, getStatByName } = useWebsiteStats()
   const [currentDate, setCurrentDate] = useState(new Date())
 
   useEffect(() => {
@@ -637,11 +639,11 @@ export default function Dashboard() {
   }
 
   const overview = {
-    totalProjects: paensData.activities.length,
-    activeProjects: paensData.activities.filter((a) => a.status === "En cours" || a.status === "Démarré").length,
-    completedProjects: paensData.activities.filter((a) => a.status === "Terminé").length,
+    totalProjects: getStatByName('total_users') || paensData.activities.length,
+    activeProjects: getStatByName('active_projects') || paensData.activities.filter((a) => a.status === "En cours" || a.status === "Démarré").length,
+    completedProjects: getStatByName('completed_projects') || paensData.activities.filter((a) => a.status === "Terminé").length,
     blockedProjects: paensData.activities.filter((a) => a.status === "Bloqué").length,
-    totalBudget: projectInfo.totalBudget,
+    totalBudget: getStatByName('total_revenue') ? getStatByName('total_revenue') / 1000 : projectInfo.totalBudget,
     overallProgress: Math.round(
       paensData.activities.reduce((sum, a) => sum + a.progress, 0) / paensData.activities.length,
     ),
@@ -2287,6 +2289,15 @@ export default function Dashboard() {
 
             <ThemeToggle />
             <NotificationsPanel />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => signOut()}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Déconnexion</span>
+            </Button>
             {profile && <UserProfileDropdown user={profile} />}
             </div>
           </div>

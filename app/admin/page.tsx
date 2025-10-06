@@ -11,8 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/lib/supabase';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Users, Database } from 'lucide-react';
+import { Users, Database, LogOut } from 'lucide-react';
 import { AdminUserTable } from '@/components/admin-user-table';
+import { WebsiteStatsCrud } from '@/components/website-stats-crud';
 
 interface UserProfile {
   id: string;
@@ -32,7 +33,7 @@ interface WebsiteStat {
 }
 
 export default function AdminPage() {
-  const { user, profile, loading, isAdmin } = useAuth();
+  const { user, profile, loading, isAdmin, signOut } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [stats, setStats] = useState<WebsiteStat[]>([]);
@@ -90,6 +91,15 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => signOut()}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Déconnexion
+            </Button>
             <UserProfileDropdown
               user={profile}
             />
@@ -115,64 +125,7 @@ export default function AdminPage() {
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Statistiques du site web</CardTitle>
-                <CardDescription>
-                  Aperçu de toutes les métriques et analyses du site web ({stats.length} métriques)
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {loadingData ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-                  </div>
-                ) : (
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Nom de la métrique</TableHead>
-                          <TableHead>Valeur</TableHead>
-                          <TableHead>Type</TableHead>
-                          <TableHead>Description</TableHead>
-                          <TableHead>Dernière mise à jour</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {stats.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                              Aucune statistique trouvée
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          stats.map((stat) => (
-                            <TableRow key={stat.id}>
-                              <TableCell className="font-medium">
-                                {stat.metric_name}
-                              </TableCell>
-                              <TableCell className="text-lg font-semibold">
-                                {stat.metric_value.toLocaleString('fr-FR')}
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant="outline">{stat.metric_type}</Badge>
-                              </TableCell>
-                              <TableCell className="max-w-md truncate">
-                                {stat.description || 'N/A'}
-                              </TableCell>
-                              <TableCell>
-                                {new Date(stat.updated_at).toLocaleDateString('fr-FR')}
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <WebsiteStatsCrud />
           </TabsContent>
         </Tabs>
       </main>
