@@ -46,16 +46,14 @@ export function ThemeTransitionProvider({ children }: { children: React.ReactNod
       setOverlayTheme(targetTheme)
       setIsTransitioning(true)
 
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          setTheme(targetTheme)
-        }, 100)
+      setTimeout(() => {
+        setTheme(targetTheme)
+      }, 50)
 
-        setTimeout(() => {
-          setIsTransitioning(false)
-          setOverlayOrigin(null)
-        }, 600)
-      })
+      setTimeout(() => {
+        setIsTransitioning(false)
+        setOverlayOrigin(null)
+      }, 500)
     },
     [isTransitioning, setTheme]
   )
